@@ -55,6 +55,7 @@ def login():
     token, captcha = captchaOCR()
     login_info = {"nonce":nonce(),"sign":signMD5(),"timestamp":timestamp(),"Code":desEncrypt(args.username),"Password":desEncrypt(args.password),"WechatUserinfoCode":"null","VerCode":captcha,"Token":token}
     loggingin = requests.post(login_url, json=login_info)
+    print(loggingin.headers)
     set_cookie = loggingin.headers['Set-Cookie']
     access_token = json.loads(loggingin.text)['data']['AccessToken']
     regex = r"\.ASPXAUTH=(.*?);"
