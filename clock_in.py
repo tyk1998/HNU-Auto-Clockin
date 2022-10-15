@@ -39,12 +39,12 @@ def timestamp():
 
 def desEncrypt(str):
     DesObj = des('hnu88888', CBC, 'hnu88888', padmode=PAD_PKCS5)
-    return DesObj.encrypt(str)
+    return str(DesObj.encrypt(str))
 
 def signMD5():
     md = hashlib.md5()
     md.update(f"{timestamp()}|{nonce}|hnu123456".encode('utf-8'))
-    return md.hexdigest()
+    return str(md.hexdigest())
 
 def nonce():
     return str(math.ceil(9999999*random.random()))
