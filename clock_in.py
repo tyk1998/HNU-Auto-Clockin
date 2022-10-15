@@ -8,7 +8,7 @@ import math
 import random
 import hashlib
 import time
-from pyDes import des, PAD_PKCS7, CBC
+from pyDes import des, PAD_PKCS5, CBC
 from captcha import recognize
 
 # 初始化变量
