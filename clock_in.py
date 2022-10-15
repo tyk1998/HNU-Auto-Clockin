@@ -38,7 +38,7 @@ def timestamp():
     return str(int(time.time() * 1000))
 
 def desEncrypt(str):
-    DesObj = des('hnu88888', CBC, 'hnu88888', padmode=PAD_PKCS7)
+    DesObj = des('hnu88888', CBC, 'hnu88888', padmode=PAD_PKCS5)
     return DesObj.encrypt(str)
 
 def signMD5():
