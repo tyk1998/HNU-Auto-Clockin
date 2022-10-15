@@ -40,7 +40,7 @@ def timestamp():
 
 def desEncrypt(str):
     DesObj = des('hnu88888', CBC, 'hnu88888', padmode=PAD_PKCS5)
-    return base64.b64encode(DesObj.encrypt(str))
+    return base64.b64encode(DesObj.encrypt(str)).decode('utf-8')
 
 def signMD5():
     md = hashlib.md5()
