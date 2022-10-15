@@ -52,7 +52,7 @@ def nonce():
 def login():
     login_url = 'https://fangkong.hnu.edu.cn/api/v1/account/login'
     token, captcha = captchaOCR()
-    login_info = {"nonce":nonce(),"sign":signMD5(),"timestamp":timestamp(),"Code":desEncrypt(args.username),"Password":desEncrypt(args.password),"WechatUserinfoCode":null,"VerCode":captcha,"Token":token}
+    login_info = {"nonce":nonce(),"sign":signMD5(),"timestamp":timestamp(),"Code":desEncrypt(args.username),"Password":desEncrypt(args.password),"WechatUserinfoCode":"null","VerCode":captcha,"Token":token}
     loggingin = requests.post(login_url, json=login_info)
     set_cookie = loggingin.headers['set-cookie']
     access_token = json.loads(loggingin.text)['data']['AccessToken']
