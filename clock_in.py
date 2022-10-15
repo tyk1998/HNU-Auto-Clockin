@@ -8,6 +8,7 @@ import math
 import random
 import hashlib
 import time
+import base64
 from pyDes import des, PAD_PKCS5, CBC
 from captcha import recognize
 
@@ -39,7 +40,7 @@ def timestamp():
 
 def desEncrypt(str):
     DesObj = des('hnu88888', CBC, 'hnu88888', padmode=PAD_PKCS5)
-    return str(DesObj.encrypt(str))
+    return base64.b64encode(DesObj.encrypt(str))
 
 def signMD5():
     md = hashlib.md5()
