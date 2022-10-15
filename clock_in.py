@@ -4,6 +4,11 @@ import argparse
 import re
 import cv2
 import numpy as np
+import math
+import random
+import hashlib
+import time
+from pyDes import des, PAD_PKCS7, CBC
 from captcha import recognize
 
 # 初始化变量
@@ -29,30 +34,48 @@ def captchaOCR():
 
     return token, captcha
 
+def timestamp():
+    return str(int(time.time() * 1000))
+
+def desEncrypt(str):
+    DesObj = des('hnu88888', CBC, 'hnu88888', padmode=PAD_PKCS7)
+    return DesObj.encrypt(str)
+
+def signMD5():
+    md = hashlib.md5()
+    md.update(f"{timestamp()}|{nonce}|hnu123456".encode('utf-8'))
+    return md.hexdigest()
+
+def nonce():
+    return str(math.ceil(9999999*random.random()))
+
 def login():
     login_url = 'https://fangkong.hnu.edu.cn/api/v1/account/login'
     token, captcha = captchaOCR()
-    login_info = {"Code":args.username,"Password":args.password,"VerCode":captcha,"Token":token}
-    
-    set_cookie = requests.post(login_url, json=login_info).headers['set-cookie']
+    login_info = {"nonce":nonce(),"sign":signMD5(),"timestamp":timestamp(),"Code":desEncrypt(args.username),"Password":desEncrypt(args.password),"WechatUserinfoCode":null,"VerCode":captcha,"Token":token}
+    loggingin = requests.post(login_url, json=login_info)
+    set_cookie = loggingin.headers['set-cookie']
+    access_token = json.loads(loggingin.text)['data']['AccessToken']
     regex = r"\.ASPXAUTH=(.*?);"
     ASPXAUTH = re.findall(regex, set_cookie)[2]
 
-    headers = {'Cookie': f'.ASPXAUTH={ASPXAUTH}; TOKEN={token}'}
+    headers = {'Cookie': f'.ASPXAUTH={ASPXAUTH}; TOKEN={access_token}'}
     return headers
 
 def setLocation():
-    location = json.loads(requests.get(f'http://api.tianditu.gov.cn/geocoder?ds={{"keyWord":\"{args.province+args.city+args.county}\"}}&tk=2355cd686a32d016021bffbc4a69d880').text)["location"]
-    real_address = "。" # 在此填写详细地址
-    return location["lon"], location["lat"], real_address
+    real_address = "湖南大学天马学生公寓" # 在此填写详细地址
+    return real_address
 
 def main():
     clockin_url = 'https://fangkong.hnu.edu.cn/api/v1/clockinlog/add'
     headers = login()
-    lon, lat, real_address = setLocation()
+    real_address = setLocation()
     clockin_data = {
-                    "Longitude":lon,
-                    "Latitude":lat,
+                    "nonce":nonce(),
+                    "sign":signMD5(),
+                    "timestamp":timestamp(),
+                    "Longitude":"null",
+                    "Latitude":"null",
                     "RealProvince":args.province,
                     "RealCity":args.city,
                     "RealCounty":args.county,
