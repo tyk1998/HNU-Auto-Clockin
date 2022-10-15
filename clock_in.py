@@ -44,7 +44,7 @@ def desEncrypt(str):
 
 def signMD5():
     md = hashlib.md5()
-    md.update(f"{timestamp()}|{nonce}|hnu123456".encode('utf-8'))
+    md.update(f"{timestamp()}|{nonce()}|hnu123456".encode('utf-8'))
     return str(md.hexdigest())
 
 def nonce():
