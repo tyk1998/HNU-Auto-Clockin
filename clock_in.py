@@ -44,18 +44,35 @@ def desEncrypt(str):
 
 def signMD5():
     md = hashlib.md5()
-    md.update(f"{timestamp()}|{nonce()}|hnu123456".encode('utf-8'))
-    return str(md.hexdigest())
+    sign = f"{timestamp()}|{nonce}|hnu123456"
+    md.update(sign.encode('utf-8'))
+    return md.hexdigest()
 
-def nonce():
-    return str(math.ceil(9999999*random.random()))
+def getNonce():
+    global nonce
+    nonce = str(math.ceil(9999999*random.random()))
+    return nonce
 
 def login():
     login_url = 'https://fangkong.hnu.edu.cn/api/v1/account/login'
     token, captcha = captchaOCR()
-    login_info = {"nonce":nonce(),"sign":signMD5(),"timestamp":timestamp(),"Code":desEncrypt(args.username),"Password":desEncrypt(args.password),"WechatUserinfoCode":"null","VerCode":captcha,"Token":token}
-    loggingin = requests.post(login_url, json=login_info)
-    print(loggingin.headers)
+    tempHeader = {
+        'Host': 'fangkong.hnu.edu.cn', 
+        'Content-Type': 'application/json;charset=utf-8', 
+        'Origin': 'https://fangkong.hnu.edu.cn', 
+        'Accept-Encoding': 'gzip, deflate, br', 
+        'Connection': 'keep-alive', 
+        'Content-Length': '251', 
+        'sec-ch-ua': '"Chromium";v="106", "Microsoft Edge";v="106", "Not;A=Brand";v="99"', 
+        'sec-ch-ua-platform': 'Windows', 
+        'Accept': 'application/json, text/plain, */*', 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.42', 
+        'Referer': 'https://fangkong.hnu.edu.cn/app/', 
+        'Content-Length': '251', 
+        'Accept-Language': 'zh-CN,zh-Hans;q=0.9'
+    }
+    login_info = {"nonce":getNonce(),"sign":signMD5(),"timestamp":timestamp(),"Code":desEncrypt(args.username),"Password":desEncrypt(args.password),"WechatUserinfoCode":"","VerCode":captcha,"Token":token}
+    loggingin = requests.post(login_url, json=login_info, headers=tempHeader)
     set_cookie = loggingin.headers['Set-Cookie']
     access_token = json.loads(loggingin.text)['data']['AccessToken']
     regex = r"\.ASPXAUTH=(.*?);"
@@ -71,22 +88,41 @@ def setLocation():
 def main():
     clockin_url = 'https://fangkong.hnu.edu.cn/api/v1/clockinlog/add'
     headers = login()
+    getNonce()
+    sign = signMD5()
+    time = timestamp()
     real_address = setLocation()
     clockin_data = {
-                    "nonce":nonce(),
-                    "sign":signMD5(),
-                    "timestamp":timestamp(),
+                    "nonce":nonce,
+                    "sign":sign,
+                    "timestamp":time,
                     "Longitude":"null",
                     "Latitude":"null",
                     "RealProvince":args.province,
                     "RealCity":args.city,
                     "RealCounty":args.county,
                     "RealAddress":real_address,
+                    "IsInCampus": "1",
+                    "ParkName": "null",
+                    "BuildingName": "null",
+                    "IsNormalTemperature": "1",
+                    "Temperature": "36.5",
+                    "IsUnusual": "0",
+                    "UnusualInfo": "",
+                    "IsInsulated": "0",
+                    "InsulatedAddress": "null",
+                    "IsOtherRedQr": "0",
                     "BackState":1,
                     "MorningTemp":"36.5",
                     "NightTemp":"36.5",
                     "tripinfolist":[],
-                    "QRCodeColor":"绿色"
+                    "QRCodeColor":"绿色",
+                    "IsInDorm": "1",
+                    "BackedAddress": "",
+                    "UnBackType": "",
+                    "UnBackReason": "",
+                    "IsLeaveOrBackToday": "0",
+                    "IsViaHuBei": "0"
                     }
 
     clockin = requests.post(clockin_url, headers=headers, json=clockin_data)
