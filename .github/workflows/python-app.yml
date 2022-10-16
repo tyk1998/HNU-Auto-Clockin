@@ -5,7 +5,6 @@ name: Auto_Clockin_GitHub_Action
 
 on:
     workflow_dispatch:
-    push:
     schedule:
     - cron: '30 16 * * *'
       # 👆在上面那行修改打卡时间
