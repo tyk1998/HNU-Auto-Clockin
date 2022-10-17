@@ -87,7 +87,10 @@ def setLocation():
 
 def main():
     clockin_url = 'https://fangkong.hnu.edu.cn/api/v1/clockinlog/add'
-    headers = login()
+    try:
+        headers = login()
+    except:
+        headers = login()
     getNonce()
     sign = signMD5()
     time = timestamp()
