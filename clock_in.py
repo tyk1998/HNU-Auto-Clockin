@@ -104,7 +104,7 @@ def main():
                     "RealProvince":args.province,
                     "RealCity":args.city,
                     "RealCounty":args.county,
-                    "湖南大学":real_address,
+                    "RealAddress":real_address,
                     "IsInCampus": "1",
                     "ParkName": "null",
                     "BuildingName": "null",
